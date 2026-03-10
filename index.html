@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-5xl mx-auto bg-white p-6 border-2 border-black">
+
+<div class="text-center border-b-2 pb-4 mb-4">
+
+<h1 class="text-xl font-bold">EMPLOYEE INSURANCE ENROLLMENT FORM</h1>
+<p class="text-sm">Company Insurance Scheme</p>
+
+</div>
+
+<form id="empForm">
+
+<h3 class="font-bold mb-2">1. Employee Details</h3>
+
+<table class="w-full border border-black text-sm">
+
+<tr>
+
+<td class="border p-2">Employee Name</td>
+<td class="border p-2"><input id="empName" class="w-full outline-none"></td>
+
+<td class="border p-2">Designation</td>
+<td class="border p-2"><input id="designation" class="w-full outline-none"></td>
+
+</tr>
+<tr>
+
+<td class="border p-2">CTC</td>
+<td class="border p-2"><input id="ctc" class="w-full outline-none"></td>
+
+<td class="border p-2">Sum Assured</td>
+<td class="border p-2"><input id="sumAssured" class="w-full outline-none"></td>
+
+</tr>
+
+<tr>
+
+<td class="border p-2">Gender</td>
+<td class="border p-2">
+
+<select id="gender" class="w-full outline-none">
+<option></option>
+<option>Male</option>
+<option>Female</option>
+</select>
+
+</td>
+
+<td class="border p-2">PAN No</td>
+<td class="border p-2"><input id="pan" class="w-full outline-none"></td>
+
+</tr>
+
+<tr>
+
+<td class="border p-2">Aadhar No</td>
+<td class="border p-2"><input id="aadhar" class="w-full outline-none"></td>
+
+<td class="border p-2">Account No</td>
+<td class="border p-2"><input id="account" class="w-full outline-none"></td>
+
+</tr>
+
+<tr>
+
+<td class="border p-2">IFSC Code</td>
+<td class="border p-2"><input id="ifsc" class="w-full outline-none"></td>
+
+<td class="border p-2">Address</td>
+<td class="border p-2"><input id="address" class="w-full outline-none"></td>
+
+</tr>
+<tr>
+  <td class="border p-2">Employee DOB</td>
+<td class="border p-2"><input id="empDob" type="date" class="w-full outline-none"></td>
+</tr>
+</table>
+
+<h3 class="font-bold mt-6 mb-2">2. Family Members Details</h3>
+
+<table class="w-full border border-black text-sm">
+
+<thead>
+
+<tr class="bg-gray-200">
+
+<th class="border p-2">Name</th>
+<th class="border p-2">Gender</th>
+<th class="border p-2">Relation</th>
+<th class="border p-2">Date of Birth</th>
+<th class="border p-2">Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="familyTable"></tbody>
+
+</table>
+
+<button type="button" onclick="addMember()"
+class="mt-2 px-3 py-1 border border-black text-sm">
+
+Add Member
+
+</button>
+
+<div class="text-center mt-6">
+
+<button id="submitBtn"
+class="bg-black text-white px-6 py-2 flex items-center gap-2 mx-auto">
+
+<span id="btnText">Submit</span>
+
+<span id="loader"
+class="hidden animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4">
+</span>
+
+</button>
+
+</div>
+
+</form>
+
+<div id="successMsg"
+class="hidden mt-4 text-green-700 bg-green-100 p-3 rounded text-center">
+
+Entry Successfully Saved
+
+</div>
+
+</div>
+
+<script>
+
+const SCRIPT_URL="PASTE_YOUR_WEB_APP_URL_HERE"
+
+function addMember(){
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+
+<td class="border p-1"><input class="w-full outline-none m-name"></td>
+
+<td class="border p-1">
+<select class="w-full outline-none m-gender">
+<option>Male</option>
+<option>Female</option>
+</select>
+</td>
+
+<td class="border p-1">
+<select class="w-full outline-none m-relation">
+<option>Wife</option>
+<option>Son</option>
+<option>Daughter</option>
+<option>Father</option>
+<option>Mother</option>
+</select>
+</td>
+
+<td class="border p-1">
+<input type="date" class="w-full outline-none m-dob">
+</td>
+
+<td class="border text-center">
+<button type="button" onclick="this.closest('tr').remove()">X</button>
+</td>
+
+`
+
+document.getElementById("familyTable").appendChild(tr)
+
+}
+
+addMember()
+
+
+document.getElementById("empForm").addEventListener("submit",async function(e){
+
+e.preventDefault()
+
+const btn=document.getElementById("submitBtn")
+const loader=document.getElementById("loader")
+const text=document.getElementById("btnText")
+
+loader.classList.remove("hidden")
+text.innerText="Saving..."
+btn.disabled=true
+
+const data={
+
+empName:empName.value,
+designation:designation.value,
+ctc:ctc.value,
+sumAssured:sumAssured.value,
+gender:gender.value,
+pan:pan.value,
+aadhar:aadhar.value,
+account:account.value,
+ifsc:ifsc.value,
+address:address.value,
+empDob:empDob.value,
+family:[]
+
+}
+
+document.querySelectorAll("#familyTable tr").forEach(r=>{
+
+const name=r.querySelector(".m-name").value
+
+if(name){
+
+data.family.push({
+
+name:name,
+gender:r.querySelector(".m-gender").value,
+relation:r.querySelector(".m-relation").value,
+dob:r.querySelector(".m-dob").value
+
+})
+
+}
+
+})
+
+try{
+
+await fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify(data),
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+loader.classList.add("hidden")
+text.innerText="Submit"
+btn.disabled=false
+
+document.getElementById("empForm").reset()
+document.getElementById("familyTable").innerHTML=""
+
+addMember()
+
+const msg=document.getElementById("successMsg")
+
+msg.classList.remove("hidden")
+
+setTimeout(()=>{
+msg.classList.add("hidden")
+},3000)
+
+}catch(err){
+
+alert("Error Saving Data")
+
+loader.classList.add("hidden")
+text.innerText="Submit"
+btn.disabled=false
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
